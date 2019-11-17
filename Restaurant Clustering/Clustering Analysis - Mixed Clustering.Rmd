@@ -97,6 +97,7 @@ lines(1:max_clusters, sil_width)
 
 After running the algorithm and selecting 7 clusters, we can interpret the clusters by running summary on each cluster. 
 ```{r}
+library(dplyr)
 num_clusters = 3
 pam_fit <- pam(gower.dist,
                  diss = TRUE,
