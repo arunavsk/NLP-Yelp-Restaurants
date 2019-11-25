@@ -5,7 +5,7 @@ Yelp reviews are one of the most useful resources people rely on in their hunt f
 This project aims to analyze restaurant reviews on Yelp via sentiment analysis to determine aspects of restaurant that users dislike. We will also try to capture segments of restaurants in a city based on cuisines, restaurant attributes, popularity and customer sentiment using clustering techniques. Finally, we will try to use topic modeling to identify popular dishes in restaurant and similar restaurants where customers can visit.
 
 TL;DR
-1. [Negative Aspect modeling]
+1. [Negative Aspect modeling]()
 2. [Restaurant Segmentation](https://github.com/arunavsk/NLP-Yelp-Restaurants/blob/master/Restaurant%20Clustering/Clustering-Analysis---Mixed-Clustering.md)
 
 
