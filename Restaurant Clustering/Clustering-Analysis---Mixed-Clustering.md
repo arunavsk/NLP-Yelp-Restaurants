@@ -30,17 +30,18 @@ df <- read.csv('../data/clusteringAD_new.csv')
 df_subset <- df[,c(37,38,39,40)]
 df_subset$rating <- as.ordered(df_subset$rating)
 df_subset$expensivenss <- as.ordered(df_subset$expensivenss)
+df_subset$cuisines <- as.ordered(df_subset$cuisines)
 summary(df_subset)
 ```
 
-    ##     cuisines         review           rating    expensivenss
-    ##  Min.   :1.000   Min.   :  52.0   3.5    :357   1: 89       
-    ##  1st Qu.:1.000   1st Qu.:  88.5   4      :313   2:697       
-    ##  Median :1.000   Median : 131.0   3      :167   3:132       
-    ##  Mean   :1.712   Mean   : 185.9   2.5    : 45   4: 17       
-    ##  3rd Qu.:2.000   3rd Qu.: 214.5   4.5    : 44               
-    ##  Max.   :5.000   Max.   :2712.0   2      :  5               
-    ##                                   (Other):  4
+    ##  cuisines     review           rating    expensivenss
+    ##  1:500    Min.   :  52.0   3.5    :357   1: 89       
+    ##  2:253    1st Qu.:  88.5   4      :313   2:697       
+    ##  3:137    Median : 131.0   3      :167   3:132       
+    ##  4: 41    Mean   : 185.9   2.5    : 45   4: 17       
+    ##  5:  4    3rd Qu.: 214.5   4.5    : 44               
+    ##           Max.   :2712.0   2      :  5               
+    ##                            (Other):  4
 
 <h2>
 
@@ -72,7 +73,7 @@ summary(gower.dist)
     ## 436645 dissimilarities, summarized :
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ## 0.00000 0.08446 0.13825 0.14818 0.20113 0.65194 
-    ## Metric :  mixed ;  Types = I, I, O, O 
+    ## Metric :  mixed ;  Types = O, I, O, O 
     ## Number of objects : 935
 
 **Look at similar/dissimilar restaurants**
@@ -204,74 +205,74 @@ pam_results$the_summary
 ```
 
     ## [[1]]
-    ##     cuisines     review           rating    expensivenss    cluster 
-    ##  Min.   :1   Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
-    ##  1st Qu.:1   1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
-    ##  Median :1   Median :117.00   2.5    : 15   3:  0        Median :1  
-    ##  Mean   :1   Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
-    ##  3rd Qu.:1   3rd Qu.:200.25   2      :  1                3rd Qu.:1  
-    ##  Max.   :1   Max.   :941.00   4      :  0                Max.   :1  
-    ##                               (Other):  0                           
+    ##  cuisines     review           rating    expensivenss    cluster 
+    ##  1:234    Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
+    ##  2:  0    1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
+    ##  3:  0    Median :117.00   2.5    : 15   3:  0        Median :1  
+    ##  4:  0    Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
+    ##  5:  0    3rd Qu.:200.25   2      :  1                3rd Qu.:1  
+    ##           Max.   :941.00   4      :  0                Max.   :1  
+    ##                            (Other):  0                           
     ## 
     ## [[2]]
-    ##     cuisines         review           rating   expensivenss    cluster 
-    ##  Min.   :3.000   Min.   :  53.0   3.5    :61   1:  6        Min.   :2  
-    ##  1st Qu.:3.000   1st Qu.: 102.5   3      :44   2:140        1st Qu.:2  
-    ##  Median :3.000   Median : 152.0   4      :36   3: 20        Median :2  
-    ##  Mean   :3.269   Mean   : 200.0   2.5    :18   4:  1        Mean   :2  
-    ##  3rd Qu.:3.000   3rd Qu.: 237.5   4.5    : 4                3rd Qu.:2  
-    ##  Max.   :5.000   Max.   :1587.0   2      : 3                Max.   :2  
-    ##                                   (Other): 1                           
+    ##  cuisines     review           rating   expensivenss    cluster 
+    ##  1:  0    Min.   :  53.0   3.5    :61   1:  6        Min.   :2  
+    ##  2:  0    1st Qu.: 102.5   3      :44   2:140        1st Qu.:2  
+    ##  3:126    Median : 152.0   4      :36   3: 20        Median :2  
+    ##  4: 37    Mean   : 200.0   2.5    :18   4:  1        Mean   :2  
+    ##  5:  4    3rd Qu.: 237.5   4.5    : 4                3rd Qu.:2  
+    ##           Max.   :1587.0   2      : 3                Max.   :2  
+    ##                            (Other): 1                           
     ## 
     ## [[3]]
-    ##     cuisines     review          rating   expensivenss    cluster 
-    ##  Min.   :2   Min.   : 55.0   3.5    :72   1:  9        Min.   :3  
-    ##  1st Qu.:2   1st Qu.: 83.0   4      :61   2:184        1st Qu.:3  
-    ##  Median :2   Median :119.0   3      :47   3:  0        Median :3  
-    ##  Mean   :2   Mean   :159.9   2.5    :10   4:  0        Mean   :3  
-    ##  3rd Qu.:2   3rd Qu.:174.0   4.5    : 2                3rd Qu.:3  
-    ##  Max.   :2   Max.   :907.0   1.5    : 1                Max.   :3  
-    ##                              (Other): 0                           
+    ##  cuisines     review          rating   expensivenss    cluster 
+    ##  1:  0    Min.   : 55.0   3.5    :72   1:  9        Min.   :3  
+    ##  2:193    1st Qu.: 83.0   4      :61   2:184        1st Qu.:3  
+    ##  3:  0    Median :119.0   3      :47   3:  0        Median :3  
+    ##  4:  0    Mean   :159.9   2.5    :10   4:  0        Mean   :3  
+    ##  5:  0    3rd Qu.:174.0   4.5    : 2                3rd Qu.:3  
+    ##           Max.   :907.0   1.5    : 1                Max.   :3  
+    ##                           (Other): 0                           
     ## 
     ## [[4]]
-    ##     cuisines         review          rating   expensivenss    cluster 
-    ##  Min.   :2.000   Min.   : 63.0   4      :38   1: 0         Min.   :4  
-    ##  1st Qu.:2.000   1st Qu.:109.0   3.5    :20   2: 0         1st Qu.:4  
-    ##  Median :2.000   Median :166.0   3      : 5   3:57         Median :4  
-    ##  Mean   :2.275   Mean   :225.4   4.5    : 5   4:12         Mean   :4  
-    ##  3rd Qu.:2.000   3rd Qu.:265.0   2.5    : 1                3rd Qu.:4  
-    ##  Max.   :4.000   Max.   :853.0   1.5    : 0                Max.   :4  
-    ##                                  (Other): 0                           
+    ##  cuisines     review          rating   expensivenss    cluster 
+    ##  1: 0     Min.   : 63.0   4      :38   1: 0         Min.   :4  
+    ##  2:54     1st Qu.:109.0   3.5    :20   2: 0         1st Qu.:4  
+    ##  3:11     Median :166.0   3      : 5   3:57         Median :4  
+    ##  4: 4     Mean   :225.4   4.5    : 5   4:12         Mean   :4  
+    ##  5: 0     3rd Qu.:265.0   2.5    : 1                3rd Qu.:4  
+    ##           Max.   :853.0   1.5    : 0                Max.   :4  
+    ##                           (Other): 0                           
     ## 
     ## [[5]]
-    ##     cuisines     review           rating    expensivenss    cluster 
-    ##  Min.   :1   Min.   :  53.0   4      :119   1:  0        Min.   :5  
-    ##  1st Qu.:1   1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
-    ##  Median :1   Median : 143.0   1.5    :  0   3:  0        Median :5  
-    ##  Mean   :1   Mean   : 230.4   2      :  0   4:  0        Mean   :5  
-    ##  3rd Qu.:1   3rd Qu.: 255.5   2.5    :  0                3rd Qu.:5  
-    ##  Max.   :1   Max.   :2712.0   3      :  0                Max.   :5  
-    ##                               (Other):  0                           
+    ##  cuisines     review           rating    expensivenss    cluster 
+    ##  1:139    Min.   :  53.0   4      :119   1:  0        Min.   :5  
+    ##  2:  0    1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
+    ##  3:  0    Median : 143.0   1.5    :  0   3:  0        Median :5  
+    ##  4:  0    Mean   : 230.4   2      :  0   4:  0        Mean   :5  
+    ##  5:  0    3rd Qu.: 255.5   2.5    :  0                3rd Qu.:5  
+    ##           Max.   :2712.0   3      :  0                Max.   :5  
+    ##                            (Other):  0                           
     ## 
     ## [[6]]
-    ##     cuisines     review          rating   expensivenss    cluster 
-    ##  Min.   :1   Min.   : 61.0   3.5    :26   1: 0         Min.   :6  
-    ##  1st Qu.:1   1st Qu.:113.5   4      :24   2: 0         1st Qu.:6  
-    ##  Median :1   Median :160.0   4.5    : 6   3:55         Median :6  
-    ##  Mean   :1   Mean   :204.8   3      : 2   4: 4         Mean   :6  
-    ##  3rd Qu.:1   3rd Qu.:222.5   2.5    : 1                3rd Qu.:6  
-    ##  Max.   :1   Max.   :890.0   1.5    : 0                Max.   :6  
-    ##                              (Other): 0                           
+    ##  cuisines     review          rating   expensivenss    cluster 
+    ##  1:59     Min.   : 61.0   3.5    :26   1: 0         Min.   :6  
+    ##  2: 0     1st Qu.:113.5   4      :24   2: 0         1st Qu.:6  
+    ##  3: 0     Median :160.0   4.5    : 6   3:55         Median :6  
+    ##  4: 0     Mean   :204.8   3      : 2   4: 4         Mean   :6  
+    ##  5: 0     3rd Qu.:222.5   2.5    : 1                3rd Qu.:6  
+    ##           Max.   :890.0   1.5    : 0                Max.   :6  
+    ##                           (Other): 0                           
     ## 
     ## [[7]]
-    ##     cuisines         review            rating   expensivenss    cluster 
-    ##  Min.   :1.000   Min.   :  57.00   4      :35   1:74         Min.   :7  
-    ##  1st Qu.:1.000   1st Qu.:  74.25   3.5    :21   2: 0         1st Qu.:7  
-    ##  Median :1.000   Median :  98.00   3      : 9   3: 0         Median :7  
-    ##  Mean   :1.081   Mean   : 158.19   4.5    : 7   4: 0         Mean   :7  
-    ##  3rd Qu.:1.000   3rd Qu.: 141.75   2      : 1                3rd Qu.:7  
-    ##  Max.   :2.000   Max.   :1279.00   5      : 1                Max.   :7  
-    ##                                    (Other): 0
+    ##  cuisines     review            rating   expensivenss    cluster 
+    ##  1:68     Min.   :  57.00   4      :35   1:74         Min.   :7  
+    ##  2: 6     1st Qu.:  74.25   3.5    :21   2: 0         1st Qu.:7  
+    ##  3: 0     Median :  98.00   3      : 9   3: 0         Median :7  
+    ##  4: 0     Mean   : 158.19   4.5    : 7   4: 0         Mean   :7  
+    ##  5: 0     3rd Qu.: 141.75   2      : 1                3rd Qu.:7  
+    ##           Max.   :1279.00   5      : 1                Max.   :7  
+    ##                             (Other): 0
 
 ***Visualizing the clusters***
 
@@ -392,24 +393,101 @@ map(m, ac)
     ## $ward
     ## [1] 0.9984664
 
-**Silhouette analysis**
+**Working with Dendograms**
 
 ``` r
-library(factoextra)
-```
-
-    ## Welcome! Related Books: `Practical Guide To Cluster Analysis in R` at https://goo.gl/13EFCZ
-
-``` r
-# sub_grp <- cutree(aggl.clust.w, k = 3)
-
-# Number of members in each cluster
-# table(sub_grp)
-# fviz_nbclust(as.matrix(gower.dist), FUN = hcut, method = "silhouette")
-fviz_nbclust(df_subset, FUN = kmeans, method = "silhouette")
+sub_grp <- cutree(aggl.clust.w, k = 6)
+plot(aggl.clust.w, cex = 0.6)
+rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 ```
 
 ![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+**Visualize results in 2D**
+
+``` r
+tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+
+tsne_data <- tsne_obj$Y %>%
+  data.frame() %>%
+  setNames(c("X", "Y")) %>%
+  mutate(cluster = factor(sub_grp),
+         name = df_subset$name)
+
+ggplot(aes(x = X, y = Y), data = tsne_data) +
+  geom_point(aes(color = cluster))
+```
+
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+**Cluster Interpretation**
+
+``` r
+algo_results <- df_subset %>%
+  mutate(cluster = sub_grp) %>%
+  group_by(cluster) %>%
+  do(the_summary = summary(.))
+
+algo_results$the_summary
+```
+
+    ## [[1]]
+    ##  cuisines     review           rating    expensivenss    cluster 
+    ##  1:234    Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
+    ##  2:  0    1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
+    ##  3:  0    Median :117.00   2.5    : 15   3:  0        Median :1  
+    ##  4:  0    Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
+    ##  5:  0    3rd Qu.:200.25   2      :  1                3rd Qu.:1  
+    ##           Max.   :941.00   4      :  0                Max.   :1  
+    ##                            (Other):  0                           
+    ## 
+    ## [[2]]
+    ##  cuisines     review           rating   expensivenss    cluster 
+    ##  1:  0    Min.   :  53.0   3.5    :43   1:  1        Min.   :2  
+    ##  2:  0    1st Qu.: 101.0   4      :36   2:138        1st Qu.:2  
+    ##  3:108    Median : 152.0   3      :35   3:  0        Median :2  
+    ##  4: 31    Mean   : 206.0   2.5    :18   4:  0        Mean   :2  
+    ##  5:  0    3rd Qu.: 236.5   4.5    : 4                3rd Qu.:2  
+    ##           Max.   :1587.0   2      : 2                Max.   :2  
+    ##                            (Other): 1                           
+    ## 
+    ## [[3]]
+    ##  cuisines     review          rating   expensivenss    cluster 
+    ##  1:  0    Min.   : 55.0   3.5    :66   1:  0        Min.   :3  
+    ##  2:184    1st Qu.: 87.0   4      :61   2:184        1st Qu.:3  
+    ##  3:  0    Median :120.0   3      :45   3:  0        Median :3  
+    ##  4:  0    Mean   :161.8   2.5    :10   4:  0        Mean   :3  
+    ##  5:  0    3rd Qu.:185.2   4.5    : 2                3rd Qu.:3  
+    ##           Max.   :907.0   1.5    : 0                Max.   :3  
+    ##                           (Other): 0                           
+    ## 
+    ## [[4]]
+    ##  cuisines     review          rating   expensivenss    cluster 
+    ##  1:59     Min.   : 61.0   3.5    :63   1:  0        Min.   :4  
+    ##  2:54     1st Qu.:112.0   4      :62   2:  2        1st Qu.:4  
+    ##  3:25     Median :166.0   3      :12   3:132        Median :4  
+    ##  4: 9     Mean   :211.1   4.5    :11   4: 17        Mean   :4  
+    ##  5: 4     3rd Qu.:250.0   2.5    : 2                3rd Qu.:4  
+    ##           Max.   :890.0   2      : 1                Max.   :4  
+    ##                           (Other): 0                           
+    ## 
+    ## [[5]]
+    ##  cuisines     review           rating    expensivenss    cluster 
+    ##  1:139    Min.   :  53.0   4      :119   1:  0        Min.   :5  
+    ##  2:  0    1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
+    ##  3:  0    Median : 143.0   1.5    :  0   3:  0        Median :5  
+    ##  4:  0    Mean   : 230.4   2      :  0   4:  0        Mean   :5  
+    ##  5:  0    3rd Qu.: 255.5   2.5    :  0                3rd Qu.:5  
+    ##           Max.   :2712.0   3      :  0                Max.   :5  
+    ##                            (Other):  0                           
+    ## 
+    ## [[6]]
+    ##  cuisines     review           rating   expensivenss    cluster 
+    ##  1:68     Min.   :  57.0   4      :35   1:88         Min.   :6  
+    ##  2:15     1st Qu.:  73.0   3.5    :28   2: 0         1st Qu.:6  
+    ##  3: 4     Median :  98.0   3      :15   3: 0         Median :6  
+    ##  4: 1     Mean   : 151.5   4.5    : 7   4: 0         Mean   :6  
+    ##  5: 0     3rd Qu.: 140.2   1.5    : 1                3rd Qu.:6  
+    ##           Max.   :1279.0   2      : 1                Max.   :6  
+    ##                            (Other): 1
 
 <h2>
 

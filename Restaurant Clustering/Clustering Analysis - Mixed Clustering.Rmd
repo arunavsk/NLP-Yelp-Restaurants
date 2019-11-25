@@ -21,6 +21,7 @@ df <- read.csv('../data/clusteringAD_new.csv')
 df_subset <- df[,c(37,38,39,40)]
 df_subset$rating <- as.ordered(df_subset$rating)
 df_subset$expensivenss <- as.ordered(df_subset$expensivenss)
+df_subset$cuisines <- as.ordered(df_subset$cuisines)
 summary(df_subset)
 
 ```
@@ -183,16 +184,36 @@ ac <- function(x) {
 
 map(m, ac)
 ```
-**Silhouette analysis**
+**Working with Dendograms**
 ```{r}
-library(factoextra)
-# sub_grp <- cutree(aggl.clust.w, k = 3)
+sub_grp <- cutree(aggl.clust.w, k = 6)
+plot(aggl.clust.w, cex = 0.6)
+rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 
-# Number of members in each cluster
-# table(sub_grp)
-# fviz_nbclust(as.matrix(gower.dist), FUN = hcut, method = "silhouette")
-fviz_nbclust(df_subset, FUN = kmeans, method = "silhouette")
 
+```
+**Visualize results in 2D**
+```{r}
+tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+
+tsne_data <- tsne_obj$Y %>%
+  data.frame() %>%
+  setNames(c("X", "Y")) %>%
+  mutate(cluster = factor(sub_grp),
+         name = df_subset$name)
+
+ggplot(aes(x = X, y = Y), data = tsne_data) +
+  geom_point(aes(color = cluster))
+```
+**Cluster Interpretation**
+
+```{r}
+algo_results <- df_subset %>%
+  mutate(cluster = sub_grp) %>%
+  group_by(cluster) %>%
+  do(the_summary = summary(.))
+
+algo_results$the_summary
 ```
 <h2>References</h2>
 1. https://www.r-bloggers.com/clustering-mixed-data-types-in-r/
