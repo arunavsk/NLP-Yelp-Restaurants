@@ -172,6 +172,8 @@ plot(aggl.clust.w,
 ```
 
 **Assess strength of the clusters**
+
+We can also get the agglomerative coefficient, which measures the amount of clustering structure found (values closer to 1 suggest strong clustering structure).
 ```{r}
 library(purrr)
 m <- c( "average", "single", "complete", "ward")
@@ -192,6 +194,7 @@ rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 
 
 ```
+
 **Visualize results in 2D**
 ```{r}
 tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
@@ -205,7 +208,9 @@ tsne_data <- tsne_obj$Y %>%
 ggplot(aes(x = X, y = Y), data = tsne_data) +
   geom_point(aes(color = cluster))
 ```
+
 **Cluster Interpretation**
+Lets try to interpret the clusters in terms of descriptive statistics
 
 ```{r}
 algo_results <- df_subset %>%
@@ -215,6 +220,9 @@ algo_results <- df_subset %>%
 
 algo_results$the_summary
 ```
+<h2>Final Comments</h2>
+
+
 <h2>References</h2>
 1. https://www.r-bloggers.com/clustering-mixed-data-types-in-r/
 2. https://towardsdatascience.com/hierarchical-clustering-on-categorical-data-in-r-a27e578f2995

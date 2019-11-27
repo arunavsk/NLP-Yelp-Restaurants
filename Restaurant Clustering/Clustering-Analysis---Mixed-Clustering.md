@@ -368,6 +368,10 @@ plot(aggl.clust.w,
 
 **Assess strength of the clusters**
 
+We can also get the agglomerative coefficient, which measures the amount
+of clustering structure found (values closer to 1 suggest strong
+clustering structure).
+
 ``` r
 library(purrr)
 m <- c( "average", "single", "complete", "ward")
@@ -402,6 +406,7 @@ rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 ```
 
 ![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
 **Visualize results in 2D**
 
 ``` r
@@ -418,7 +423,9 @@ ggplot(aes(x = X, y = Y), data = tsne_data) +
 ```
 
 ![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-**Cluster Interpretation**
+
+**Cluster Interpretation** Lets try to interpret the clusters in terms
+of descriptive statistics
 
 ``` r
 algo_results <- df_subset %>%
@@ -488,6 +495,12 @@ algo_results$the_summary
     ##  5: 0     3rd Qu.: 140.2   1.5    : 1                3rd Qu.:6  
     ##           Max.   :1279.0   2      : 1                Max.   :6  
     ##                            (Other): 1
+
+<h2>
+
+Final Comments
+
+</h2>
 
 <h2>
 
