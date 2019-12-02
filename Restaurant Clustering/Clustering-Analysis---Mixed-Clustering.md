@@ -27,21 +27,70 @@ Read data and cast variables appropriately. The different data types are
 
 ``` r
 df <- read.csv('../data/clusteringAD_new.csv')
-df_subset <- df[,c(37,38,39,40)]
-df_subset$rating <- as.ordered(df_subset$rating)
-df_subset$expensivenss <- as.ordered(df_subset$expensivenss)
-df_subset$cuisines <- as.ordered(df_subset$cuisines)
-summary(df_subset)
+
+df_subset <- df[,c(17:40)]
+cols.num <- c(1:10,21,22)
+cols.logical <- c(11:20)
+
+df_subset[cols.num] <- sapply(df_subset[cols.num],as.numeric)
+df_subset[cols.logical] <- sapply(df_subset[cols.logical],as.logical)
+
+df_subset$rating = factor(df_subset$rating,
+                            ordered = TRUE,
+                            levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5" ,"5"))
+
+df_subset$expensivenss = factor(df_subset$expensivenss,
+                            ordered = TRUE,
+                            levels = c("1", "2", "3", "4"))
+
+
+# colnames(df_subset)
+# sapply(df_subset, class)
+str(df_subset)
 ```
 
-    ##  cuisines     review           rating    expensivenss
-    ##  1:500    Min.   :  52.0   3.5    :357   1: 89       
-    ##  2:253    1st Qu.:  88.5   4      :313   2:697       
-    ##  3:137    Median : 131.0   3      :167   3:132       
-    ##  4: 41    Mean   : 185.9   2.5    : 45   4: 17       
-    ##  5:  4    3rd Qu.: 214.5   4.5    : 44               
-    ##           Max.   :2712.0   2      :  5               
-    ##                            (Other):  4
+    ## 'data.frame':    935 obs. of  24 variables:
+    ##  $ X0_Afternoon : num  2 1 0 1.14 0 ...
+    ##  $ X0_Evening   : num  4 2.61 0 2.59 1.38 ...
+    ##  $ X0_Late.Night: num  1.33 3 1 1.67 0 ...
+    ##  $ X0_Morning   : num  1 1 1 1 0 1 0 1 1 1 ...
+    ##  $ X0_Night     : num  2 5.58 2.11 3.33 2.69 ...
+    ##  $ X1_Afternoon : num  8.2 1 1 0 1 1.5 0 1 1 2 ...
+    ##  $ X1_Evening   : num  12.93 5.21 1 3.64 1.77 ...
+    ##  $ X1_Late.Night: num  3 1.5 3.25 1.25 0 ...
+    ##  $ X1_Morning   : num  1 0 2 0 1 1.25 0 1 1.25 0 ...
+    ##  $ X1_Night     : num  3.33 7.06 3.38 5.76 3.81 ...
+    ##  $ Nightlife    : logi  FALSE TRUE TRUE FALSE FALSE TRUE ...
+    ##  $ Bars         : logi  FALSE TRUE TRUE TRUE FALSE TRUE ...
+    ##  $ Canadian     : logi  FALSE FALSE FALSE FALSE FALSE TRUE ...
+    ##  $ Chinese      : logi  TRUE FALSE FALSE FALSE FALSE FALSE ...
+    ##  $ Italian      : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+    ##  $ Japanese     : logi  FALSE FALSE FALSE TRUE FALSE FALSE ...
+    ##  $ American     : logi  FALSE FALSE TRUE FALSE TRUE TRUE ...
+    ##  $ Indian       : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+    ##  $ Mexican      : logi  FALSE TRUE FALSE FALSE TRUE FALSE ...
+    ##  $ Thai         : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+    ##  $ cuisines     : num  1 3 3 2 2 4 1 4 2 3 ...
+    ##  $ review       : num  263 431 83 167 163 364 84 80 299 238 ...
+    ##  $ rating       : Ord.factor w/ 9 levels "1"<"1.5"<"2"<..: 5 7 7 6 7 7 6 4 7 5 ...
+    ##  $ expensivenss : Ord.factor w/ 4 levels "1"<"2"<"3"<"4": 2 2 2 2 2 3 2 2 2 3 ...
+
+<h2>
+
+Create Feature subsets
+
+</h2>
+
+Create 4 different feature subset <br> 1. cuisines, review, rating,
+expensiveness <br> 2. Features in 1 + Check in information <br> 3.
+Features in 1 + Cuisine Flags <br> 4. All Features
+
+``` r
+fsubset_0 = c(21,22,23,24)
+fsubset_1 = c(1:10, fsubset_0)
+fsubset_2 = c(11:20, fsubset_0)
+fsubset_3 = c(1:24)
+```
 
 <h2>
 
@@ -64,16 +113,34 @@ Concept of Gower distance - For each variable type, a particular
 distance metric that works well for that type is used and scaled to fall
 between 0 and 1.
 
+Calculate gower distance for each feature subset.
+
 ``` r
 library(cluster) 
-gower.dist <- daisy(df_subset, metric = c("gower"))
-summary(gower.dist)
+
+gower.dist.0 <- daisy(df_subset[,fsubset_0], metric = c("gower"))
+gower.dist.1 <- daisy(df_subset[,fsubset_1], metric = c("gower"))
+gower.dist.2 <- daisy(df_subset[,fsubset_2], metric = c("gower"))
+```
+
+    ## Warning in daisy(df_subset[, fsubset_2], metric = c("gower")): setting 'logical'
+    ## variables 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 to type 'asymm'
+
+``` r
+gower.dist.3 <- daisy(df_subset[,fsubset_3], metric = c("gower"))
+```
+
+    ## Warning in daisy(df_subset[, fsubset_3], metric = c("gower")): setting 'logical'
+    ## variables 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 to type 'asymm'
+
+``` r
+summary(gower.dist.0)
 ```
 
     ## 436645 dissimilarities, summarized :
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ## 0.00000 0.08446 0.13825 0.14818 0.20113 0.65194 
-    ## Metric :  mixed ;  Types = O, I, O, O 
+    ## Metric :  mixed ;  Types = I, I, O, O 
     ## Number of objects : 935
 
 **Look at similar/dissimilar restaurants**
@@ -84,13 +151,13 @@ Similar pairs will have similar features and for pairs which are
 dissimilar the features will be completely different
 
 ``` r
-gower_mat <- as.matrix(gower.dist)
+gower_mat <- as.matrix(gower.dist.0)
 
 # Output most similar pair
 
 df_subset[
   which(gower_mat == min(gower_mat[gower_mat != min(gower_mat)]),
-        arr.ind = TRUE)[1, ], ]
+        arr.ind = TRUE)[1, ], fsubset_0]
 ```
 
     ##     cuisines review rating expensivenss
@@ -102,7 +169,7 @@ df_subset[
 
 df_subset[
   which(gower_mat == max(gower_mat[gower_mat != max(gower_mat)]),
-        arr.ind = TRUE)[1, ], ]
+        arr.ind = TRUE)[1, ],fsubset_0 ]
 ```
 
     ##     cuisines review rating expensivenss
@@ -146,29 +213,70 @@ silhouette score, but that does not make sense or satisfy the objective.
 Long story short, we should pick a meaningful number that is simple and
 equally as good.
 
+We look at silhouette score for all feature subsets
+
 ``` r
 max_clusters <- 20
-sil_width <- c(NA)
+sil_width_0 <- c(NA)
+sil_width_1 <- c(NA)
+sil_width_2 <- c(NA)
+sil_width_3 <- c(NA)
+
+
 
 for(i in 2:max_clusters){
-  
-  pam_fit <- pam(gower.dist,
+  pam_fit <- pam(gower.dist.0,
                  diss = TRUE,
                  k = i)
   
-  sil_width[i] <- pam_fit$silinfo$avg.width
+  sil_width_0[i] <- pam_fit$silinfo$avg.width
   
 }
 
-# Plot sihouette width (higher is better)
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.1,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_1[i] <- pam_fit$silinfo$avg.width
+  
+}
 
-plot(1:max_clusters, sil_width,
-     xlab = "Number of clusters",
-     ylab = "Silhouette Width")
-lines(1:max_clusters, sil_width)
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.2,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_2[i] <- pam_fit$silinfo$avg.width
+  
+}
+
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.3,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_3[i] <- pam_fit$silinfo$avg.width
+  
+}
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+***Visualize the results of Silhouette Analysis***
+
+``` r
+plot(1:max_clusters, sil_width_0, type="o", col="blue", pch="o", lty=1,ylim=c(0.1,0.7),ylab="Silhouette Width",xlab = 'Number of clusters' )
+points(1:max_clusters, sil_width_1, col="red", pch="*")
+lines(1:max_clusters, sil_width_1, col="red",lty=2)
+points(1:max_clusters, sil_width_2, col="dark green", pch="+")
+lines(1:max_clusters, sil_width_2, col="dark green",lty=3)
+points(1:max_clusters, sil_width_3, col="dark red", pch="x")
+lines(1:max_clusters, sil_width_3, col="dark red",lty=4)
+
+legend(1,0.7,legend=c("0","1","2", "3"), col=c("blue","red","dark green" ,"dark red"),
+                                   pch=c("o","*","+", "x"),lty=c(1,2,3,4), ncol=1)
+```
+
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ***Cluster Interpretation via descriptive statistics***
 
@@ -192,11 +300,11 @@ library(dplyr)
 
 ``` r
 num_clusters = 7
-pam_fit <- pam(gower.dist,
+pam_fit <- pam(gower.dist.0,
                  diss = TRUE,
                  k = num_clusters)
 
-pam_results <- df_subset %>%
+pam_results <- df_subset[, fsubset_0] %>%
   mutate(cluster = pam_fit$clustering) %>%
   group_by(cluster) %>%
   do(the_summary = summary(.))
@@ -205,74 +313,74 @@ pam_results$the_summary
 ```
 
     ## [[1]]
-    ##  cuisines     review           rating    expensivenss    cluster 
-    ##  1:234    Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
-    ##  2:  0    1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
-    ##  3:  0    Median :117.00   2.5    : 15   3:  0        Median :1  
-    ##  4:  0    Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
-    ##  5:  0    3rd Qu.:200.25   2      :  1                3rd Qu.:1  
-    ##           Max.   :941.00   4      :  0                Max.   :1  
-    ##                            (Other):  0                           
+    ##     cuisines     review           rating    expensivenss    cluster 
+    ##  Min.   :1   Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
+    ##  1st Qu.:1   1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
+    ##  Median :1   Median :117.00   2.5    : 15   3:  0        Median :1  
+    ##  Mean   :1   Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
+    ##  3rd Qu.:1   3rd Qu.:200.25   2      :  1                3rd Qu.:1  
+    ##  Max.   :1   Max.   :941.00   1      :  0                Max.   :1  
+    ##                               (Other):  0                           
     ## 
     ## [[2]]
-    ##  cuisines     review           rating   expensivenss    cluster 
-    ##  1:  0    Min.   :  53.0   3.5    :61   1:  6        Min.   :2  
-    ##  2:  0    1st Qu.: 102.5   3      :44   2:140        1st Qu.:2  
-    ##  3:126    Median : 152.0   4      :36   3: 20        Median :2  
-    ##  4: 37    Mean   : 200.0   2.5    :18   4:  1        Mean   :2  
-    ##  5:  4    3rd Qu.: 237.5   4.5    : 4                3rd Qu.:2  
-    ##           Max.   :1587.0   2      : 3                Max.   :2  
-    ##                            (Other): 1                           
+    ##     cuisines         review           rating   expensivenss    cluster 
+    ##  Min.   :3.000   Min.   :  53.0   3.5    :61   1:  6        Min.   :2  
+    ##  1st Qu.:3.000   1st Qu.: 102.5   3      :44   2:140        1st Qu.:2  
+    ##  Median :3.000   Median : 152.0   4      :36   3: 20        Median :2  
+    ##  Mean   :3.269   Mean   : 200.0   2.5    :18   4:  1        Mean   :2  
+    ##  3rd Qu.:3.000   3rd Qu.: 237.5   4.5    : 4                3rd Qu.:2  
+    ##  Max.   :5.000   Max.   :1587.0   2      : 3                Max.   :2  
+    ##                                   (Other): 1                           
     ## 
     ## [[3]]
-    ##  cuisines     review          rating   expensivenss    cluster 
-    ##  1:  0    Min.   : 55.0   3.5    :72   1:  9        Min.   :3  
-    ##  2:193    1st Qu.: 83.0   4      :61   2:184        1st Qu.:3  
-    ##  3:  0    Median :119.0   3      :47   3:  0        Median :3  
-    ##  4:  0    Mean   :159.9   2.5    :10   4:  0        Mean   :3  
-    ##  5:  0    3rd Qu.:174.0   4.5    : 2                3rd Qu.:3  
-    ##           Max.   :907.0   1.5    : 1                Max.   :3  
-    ##                           (Other): 0                           
+    ##     cuisines     review          rating   expensivenss    cluster 
+    ##  Min.   :2   Min.   : 55.0   3.5    :72   1:  9        Min.   :3  
+    ##  1st Qu.:2   1st Qu.: 83.0   4      :61   2:184        1st Qu.:3  
+    ##  Median :2   Median :119.0   3      :47   3:  0        Median :3  
+    ##  Mean   :2   Mean   :159.9   2.5    :10   4:  0        Mean   :3  
+    ##  3rd Qu.:2   3rd Qu.:174.0   4.5    : 2                3rd Qu.:3  
+    ##  Max.   :2   Max.   :907.0   1.5    : 1                Max.   :3  
+    ##                              (Other): 0                           
     ## 
     ## [[4]]
-    ##  cuisines     review          rating   expensivenss    cluster 
-    ##  1: 0     Min.   : 63.0   4      :38   1: 0         Min.   :4  
-    ##  2:54     1st Qu.:109.0   3.5    :20   2: 0         1st Qu.:4  
-    ##  3:11     Median :166.0   3      : 5   3:57         Median :4  
-    ##  4: 4     Mean   :225.4   4.5    : 5   4:12         Mean   :4  
-    ##  5: 0     3rd Qu.:265.0   2.5    : 1                3rd Qu.:4  
-    ##           Max.   :853.0   1.5    : 0                Max.   :4  
-    ##                           (Other): 0                           
+    ##     cuisines         review          rating   expensivenss    cluster 
+    ##  Min.   :2.000   Min.   : 63.0   4      :38   1: 0         Min.   :4  
+    ##  1st Qu.:2.000   1st Qu.:109.0   3.5    :20   2: 0         1st Qu.:4  
+    ##  Median :2.000   Median :166.0   3      : 5   3:57         Median :4  
+    ##  Mean   :2.275   Mean   :225.4   4.5    : 5   4:12         Mean   :4  
+    ##  3rd Qu.:2.000   3rd Qu.:265.0   2.5    : 1                3rd Qu.:4  
+    ##  Max.   :4.000   Max.   :853.0   1      : 0                Max.   :4  
+    ##                                  (Other): 0                           
     ## 
     ## [[5]]
-    ##  cuisines     review           rating    expensivenss    cluster 
-    ##  1:139    Min.   :  53.0   4      :119   1:  0        Min.   :5  
-    ##  2:  0    1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
-    ##  3:  0    Median : 143.0   1.5    :  0   3:  0        Median :5  
-    ##  4:  0    Mean   : 230.4   2      :  0   4:  0        Mean   :5  
-    ##  5:  0    3rd Qu.: 255.5   2.5    :  0                3rd Qu.:5  
-    ##           Max.   :2712.0   3      :  0                Max.   :5  
-    ##                            (Other):  0                           
+    ##     cuisines     review           rating    expensivenss    cluster 
+    ##  Min.   :1   Min.   :  53.0   4      :119   1:  0        Min.   :5  
+    ##  1st Qu.:1   1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
+    ##  Median :1   Median : 143.0   1      :  0   3:  0        Median :5  
+    ##  Mean   :1   Mean   : 230.4   1.5    :  0   4:  0        Mean   :5  
+    ##  3rd Qu.:1   3rd Qu.: 255.5   2      :  0                3rd Qu.:5  
+    ##  Max.   :1   Max.   :2712.0   2.5    :  0                Max.   :5  
+    ##                               (Other):  0                           
     ## 
     ## [[6]]
-    ##  cuisines     review          rating   expensivenss    cluster 
-    ##  1:59     Min.   : 61.0   3.5    :26   1: 0         Min.   :6  
-    ##  2: 0     1st Qu.:113.5   4      :24   2: 0         1st Qu.:6  
-    ##  3: 0     Median :160.0   4.5    : 6   3:55         Median :6  
-    ##  4: 0     Mean   :204.8   3      : 2   4: 4         Mean   :6  
-    ##  5: 0     3rd Qu.:222.5   2.5    : 1                3rd Qu.:6  
-    ##           Max.   :890.0   1.5    : 0                Max.   :6  
-    ##                           (Other): 0                           
+    ##     cuisines     review          rating   expensivenss    cluster 
+    ##  Min.   :1   Min.   : 61.0   3.5    :26   1: 0         Min.   :6  
+    ##  1st Qu.:1   1st Qu.:113.5   4      :24   2: 0         1st Qu.:6  
+    ##  Median :1   Median :160.0   4.5    : 6   3:55         Median :6  
+    ##  Mean   :1   Mean   :204.8   3      : 2   4: 4         Mean   :6  
+    ##  3rd Qu.:1   3rd Qu.:222.5   2.5    : 1                3rd Qu.:6  
+    ##  Max.   :1   Max.   :890.0   1      : 0                Max.   :6  
+    ##                              (Other): 0                           
     ## 
     ## [[7]]
-    ##  cuisines     review            rating   expensivenss    cluster 
-    ##  1:68     Min.   :  57.00   4      :35   1:74         Min.   :7  
-    ##  2: 6     1st Qu.:  74.25   3.5    :21   2: 0         1st Qu.:7  
-    ##  3: 0     Median :  98.00   3      : 9   3: 0         Median :7  
-    ##  4: 0     Mean   : 158.19   4.5    : 7   4: 0         Mean   :7  
-    ##  5: 0     3rd Qu.: 141.75   2      : 1                3rd Qu.:7  
-    ##           Max.   :1279.00   5      : 1                Max.   :7  
-    ##                             (Other): 0
+    ##     cuisines         review            rating   expensivenss    cluster 
+    ##  Min.   :1.000   Min.   :  57.00   4      :35   1:74         Min.   :7  
+    ##  1st Qu.:1.000   1st Qu.:  74.25   3.5    :21   2: 0         1st Qu.:7  
+    ##  Median :1.000   Median :  98.00   3      : 9   3: 0         Median :7  
+    ##  Mean   :1.081   Mean   : 158.19   4.5    : 7   4: 0         Mean   :7  
+    ##  3rd Qu.:1.000   3rd Qu.: 141.75   2      : 1                3rd Qu.:7  
+    ##  Max.   :2.000   Max.   :1279.00   5      : 1                Max.   :7  
+    ##                                    (Other): 0
 
 ***Visualizing the clusters***
 
@@ -285,19 +393,19 @@ library(ggplot2)
 library(dplyr)
 
 
-tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+tsne_obj <- Rtsne(gower.dist.0, is_distance = TRUE)
 
 tsne_data <- tsne_obj$Y %>%
   data.frame() %>%
   setNames(c("X", "Y")) %>%
   mutate(cluster = factor(pam_fit$clustering),
-         name = df_subset$name)
+         name = df_subset[,fsubset_0]$name)
 
 ggplot(aes(x = X, y = Y), data = tsne_data) +
   geom_point(aes(color = cluster))
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 <h2>
 
@@ -333,7 +441,7 @@ clusters.***
 
 ``` r
 #------------ DIVISIVE CLUSTERING ------------#
-divisive.clust <- diana(gower.dist, 
+divisive.clust <- diana(gower.dist.0, 
                   diss = TRUE, keep.diss = FALSE)
 divisive.clust$dc
 ```
@@ -344,16 +452,16 @@ divisive.clust$dc
 pltree(divisive.clust, main = "Divisive")
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 #------------ AGGLOMERATIVE CLUSTERING ------------#
 # “complete”, “average”, “single”, “ward.D”
 par(mfrow=c(2,2))
-aggl.clust.c <- hclust(gower.dist, method = "complete")
-aggl.clust.a <- hclust(gower.dist, method = "average")
-aggl.clust.s <- hclust(gower.dist, method = "single")
-aggl.clust.w <- hclust(gower.dist, method = "ward.D")
+aggl.clust.c <- hclust(gower.dist.0, method = "complete")
+aggl.clust.a <- hclust(gower.dist.0, method = "average")
+aggl.clust.s <- hclust(gower.dist.0, method = "single")
+aggl.clust.w <- hclust(gower.dist.0, method = "ward.D")
 plot(aggl.clust.c,
      main = "Agglomerative, complete linkages")
 plot(aggl.clust.a,
@@ -364,7 +472,7 @@ plot(aggl.clust.w,
      main = "Agglomerative, ward linkages")
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 **Assess strength of the clusters**
 
@@ -379,7 +487,7 @@ names(m) <- c( "average", "single", "complete", "ward")
 
 # function to compute coefficient
 ac <- function(x) {
-  agnes(gower.dist, diss = TRUE, method = x)$ac
+  agnes(gower.dist.0, diss = TRUE, method = x)$ac
 }
 
 map(m, ac)
@@ -405,30 +513,30 @@ plot(aggl.clust.w, cex = 0.6)
 rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 **Visualize results in 2D**
 
 ``` r
-tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+tsne_obj <- Rtsne(gower.dist.0, is_distance = TRUE)
 
 tsne_data <- tsne_obj$Y %>%
   data.frame() %>%
   setNames(c("X", "Y")) %>%
   mutate(cluster = factor(sub_grp),
-         name = df_subset$name)
+         name = df_subset[,fsubset_0]$name)
 
 ggplot(aes(x = X, y = Y), data = tsne_data) +
   geom_point(aes(color = cluster))
 ```
 
-![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](Clustering-Analysis---Mixed-Clustering_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 **Cluster Interpretation** Lets try to interpret the clusters in terms
 of descriptive statistics
 
 ``` r
-algo_results <- df_subset %>%
+algo_results <- df_subset[,fsubset_0] %>%
   mutate(cluster = sub_grp) %>%
   group_by(cluster) %>%
   do(the_summary = summary(.))
@@ -437,64 +545,64 @@ algo_results$the_summary
 ```
 
     ## [[1]]
-    ##  cuisines     review           rating    expensivenss    cluster 
-    ##  1:234    Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
-    ##  2:  0    1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
-    ##  3:  0    Median :117.00   2.5    : 15   3:  0        Median :1  
-    ##  4:  0    Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
-    ##  5:  0    3rd Qu.:200.25   2      :  1                3rd Qu.:1  
-    ##           Max.   :941.00   4      :  0                Max.   :1  
-    ##                            (Other):  0                           
+    ##     cuisines     review           rating    expensivenss    cluster 
+    ##  Min.   :1   Min.   : 52.00   3.5    :157   1:  0        Min.   :1  
+    ##  1st Qu.:1   1st Qu.: 85.25   3      : 60   2:234        1st Qu.:1  
+    ##  Median :1   Median :117.00   2.5    : 15   3:  0        Median :1  
+    ##  Mean   :1   Mean   :163.17   1.5    :  1   4:  0        Mean   :1  
+    ##  3rd Qu.:1   3rd Qu.:200.25   2      :  1                3rd Qu.:1  
+    ##  Max.   :1   Max.   :941.00   1      :  0                Max.   :1  
+    ##                               (Other):  0                           
     ## 
     ## [[2]]
-    ##  cuisines     review           rating   expensivenss    cluster 
-    ##  1:  0    Min.   :  53.0   3.5    :43   1:  1        Min.   :2  
-    ##  2:  0    1st Qu.: 101.0   4      :36   2:138        1st Qu.:2  
-    ##  3:108    Median : 152.0   3      :35   3:  0        Median :2  
-    ##  4: 31    Mean   : 206.0   2.5    :18   4:  0        Mean   :2  
-    ##  5:  0    3rd Qu.: 236.5   4.5    : 4                3rd Qu.:2  
-    ##           Max.   :1587.0   2      : 2                Max.   :2  
-    ##                            (Other): 1                           
+    ##     cuisines         review           rating   expensivenss    cluster 
+    ##  Min.   :3.000   Min.   :  53.0   3.5    :43   1:  1        Min.   :2  
+    ##  1st Qu.:3.000   1st Qu.: 101.0   4      :36   2:138        1st Qu.:2  
+    ##  Median :3.000   Median : 152.0   3      :35   3:  0        Median :2  
+    ##  Mean   :3.223   Mean   : 206.0   2.5    :18   4:  0        Mean   :2  
+    ##  3rd Qu.:3.000   3rd Qu.: 236.5   4.5    : 4                3rd Qu.:2  
+    ##  Max.   :4.000   Max.   :1587.0   2      : 2                Max.   :2  
+    ##                                   (Other): 1                           
     ## 
     ## [[3]]
-    ##  cuisines     review          rating   expensivenss    cluster 
-    ##  1:  0    Min.   : 55.0   3.5    :66   1:  0        Min.   :3  
-    ##  2:184    1st Qu.: 87.0   4      :61   2:184        1st Qu.:3  
-    ##  3:  0    Median :120.0   3      :45   3:  0        Median :3  
-    ##  4:  0    Mean   :161.8   2.5    :10   4:  0        Mean   :3  
-    ##  5:  0    3rd Qu.:185.2   4.5    : 2                3rd Qu.:3  
-    ##           Max.   :907.0   1.5    : 0                Max.   :3  
-    ##                           (Other): 0                           
+    ##     cuisines     review          rating   expensivenss    cluster 
+    ##  Min.   :2   Min.   : 55.0   3.5    :66   1:  0        Min.   :3  
+    ##  1st Qu.:2   1st Qu.: 87.0   4      :61   2:184        1st Qu.:3  
+    ##  Median :2   Median :120.0   3      :45   3:  0        Median :3  
+    ##  Mean   :2   Mean   :161.8   2.5    :10   4:  0        Mean   :3  
+    ##  3rd Qu.:2   3rd Qu.:185.2   4.5    : 2                3rd Qu.:3  
+    ##  Max.   :2   Max.   :907.0   1      : 0                Max.   :3  
+    ##                              (Other): 0                           
     ## 
     ## [[4]]
-    ##  cuisines     review          rating   expensivenss    cluster 
-    ##  1:59     Min.   : 61.0   3.5    :63   1:  0        Min.   :4  
-    ##  2:54     1st Qu.:112.0   4      :62   2:  2        1st Qu.:4  
-    ##  3:25     Median :166.0   3      :12   3:132        Median :4  
-    ##  4: 9     Mean   :211.1   4.5    :11   4: 17        Mean   :4  
-    ##  5: 4     3rd Qu.:250.0   2.5    : 2                3rd Qu.:4  
-    ##           Max.   :890.0   2      : 1                Max.   :4  
-    ##                           (Other): 0                           
+    ##     cuisines         review          rating   expensivenss    cluster 
+    ##  Min.   :1.000   Min.   : 61.0   3.5    :63   1:  0        Min.   :4  
+    ##  1st Qu.:1.000   1st Qu.:112.0   4      :62   2:  2        1st Qu.:4  
+    ##  Median :2.000   Median :166.0   3      :12   3:132        Median :4  
+    ##  Mean   :1.974   Mean   :211.1   4.5    :11   4: 17        Mean   :4  
+    ##  3rd Qu.:2.500   3rd Qu.:250.0   2.5    : 2                3rd Qu.:4  
+    ##  Max.   :5.000   Max.   :890.0   2      : 1                Max.   :4  
+    ##                                  (Other): 0                           
     ## 
     ## [[5]]
-    ##  cuisines     review           rating    expensivenss    cluster 
-    ##  1:139    Min.   :  53.0   4      :119   1:  0        Min.   :5  
-    ##  2:  0    1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
-    ##  3:  0    Median : 143.0   1.5    :  0   3:  0        Median :5  
-    ##  4:  0    Mean   : 230.4   2      :  0   4:  0        Mean   :5  
-    ##  5:  0    3rd Qu.: 255.5   2.5    :  0                3rd Qu.:5  
-    ##           Max.   :2712.0   3      :  0                Max.   :5  
-    ##                            (Other):  0                           
+    ##     cuisines     review           rating    expensivenss    cluster 
+    ##  Min.   :1   Min.   :  53.0   4      :119   1:  0        Min.   :5  
+    ##  1st Qu.:1   1st Qu.:  94.0   4.5    : 20   2:139        1st Qu.:5  
+    ##  Median :1   Median : 143.0   1      :  0   3:  0        Median :5  
+    ##  Mean   :1   Mean   : 230.4   1.5    :  0   4:  0        Mean   :5  
+    ##  3rd Qu.:1   3rd Qu.: 255.5   2      :  0                3rd Qu.:5  
+    ##  Max.   :1   Max.   :2712.0   2.5    :  0                Max.   :5  
+    ##                               (Other):  0                           
     ## 
     ## [[6]]
-    ##  cuisines     review           rating   expensivenss    cluster 
-    ##  1:68     Min.   :  57.0   4      :35   1:88         Min.   :6  
-    ##  2:15     1st Qu.:  73.0   3.5    :28   2: 0         1st Qu.:6  
-    ##  3: 4     Median :  98.0   3      :15   3: 0         Median :6  
-    ##  4: 1     Mean   : 151.5   4.5    : 7   4: 0         Mean   :6  
-    ##  5: 0     3rd Qu.: 140.2   1.5    : 1                3rd Qu.:6  
-    ##           Max.   :1279.0   2      : 1                Max.   :6  
-    ##                            (Other): 1
+    ##     cuisines         review           rating   expensivenss    cluster 
+    ##  Min.   :1.000   Min.   :  57.0   4      :35   1:88         Min.   :6  
+    ##  1st Qu.:1.000   1st Qu.:  73.0   3.5    :28   2: 0         1st Qu.:6  
+    ##  Median :1.000   Median :  98.0   3      :15   3: 0         Median :6  
+    ##  Mean   :1.295   Mean   : 151.5   4.5    : 7   4: 0         Mean   :6  
+    ##  3rd Qu.:1.000   3rd Qu.: 140.2   1.5    : 1                3rd Qu.:6  
+    ##  Max.   :4.000   Max.   :1279.0   2      : 1                Max.   :6  
+    ##                                   (Other): 1
 
 <h2>
 

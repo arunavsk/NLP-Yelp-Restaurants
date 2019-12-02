@@ -18,13 +18,41 @@ Read data and cast variables appropriately. The different data types are :
 ```{r}
 
 df <- read.csv('../data/clusteringAD_new.csv')
-df_subset <- df[,c(37,38,39,40)]
-df_subset$rating <- as.ordered(df_subset$rating)
-df_subset$expensivenss <- as.ordered(df_subset$expensivenss)
-df_subset$cuisines <- as.ordered(df_subset$cuisines)
-summary(df_subset)
 
+df_subset <- df[,c(17:40)]
+cols.num <- c(1:10,21,22)
+cols.logical <- c(11:20)
+
+df_subset[cols.num] <- sapply(df_subset[cols.num],as.numeric)
+df_subset[cols.logical] <- sapply(df_subset[cols.logical],as.logical)
+
+df_subset$rating = factor(df_subset$rating,
+                            ordered = TRUE,
+                            levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5" ,"5"))
+
+df_subset$expensivenss = factor(df_subset$expensivenss,
+                            ordered = TRUE,
+                            levels = c("1", "2", "3", "4"))
+
+
+# colnames(df_subset)
+# sapply(df_subset, class)
+str(df_subset)
 ```
+<h2> Create Feature subsets </h2>
+
+Create 4 different feature subset <br>
+1. cuisines, review, rating, expensiveness <br>
+2. Features in 1 + Check in information <br>
+3. Features in 1 + Cuisine Flags <br>
+4. All Features
+```{r}
+fsubset_0 = c(21,22,23,24)
+fsubset_1 = c(1:10, fsubset_0)
+fsubset_2 = c(11:20, fsubset_0)
+fsubset_3 = c(1:24)
+```
+
 <h2> Calculating Distance Metric </h2>
 
 **Gower Distance**
@@ -32,27 +60,35 @@ summary(df_subset)
 In order for a yet-to-be-chosen algorithm to group observations together, we first need to define some notion of (dis)similarity between observations. A popular choice for clustering is Euclidean distance. However, Euclidean distance is only valid for continuous variables, and thus is not applicable here. In order for a clustering algorithm to yield sensible results, we have to use a distance metric that can handle mixed data types. In this case, we will use something called Gower distance.[1]
 
 Concept of Gower distance - For each variable type, a particular distance metric that works well for that type is used and scaled to fall between 0 and 1.
+
+Calculate gower distance for each feature subset.
 ```{r}
 library(cluster) 
-gower.dist <- daisy(df_subset, metric = c("gower"))
-summary(gower.dist)
+
+gower.dist.0 <- daisy(df_subset[,fsubset_0], metric = c("gower"))
+gower.dist.1 <- daisy(df_subset[,fsubset_1], metric = c("gower"))
+gower.dist.2 <- daisy(df_subset[,fsubset_2], metric = c("gower"))
+gower.dist.3 <- daisy(df_subset[,fsubset_3], metric = c("gower"))
+
+
+summary(gower.dist.0)
 ```
 **Look at similar/dissimilar restaurants**
 
 As a sanity check, to make sure the metric is working, we can check the most similar and dissimilar pairs in terms of the Gower distance. Similar pairs will have similar features and for pairs which are dissimilar the features will be completely different
 ```{r}
-gower_mat <- as.matrix(gower.dist)
+gower_mat <- as.matrix(gower.dist.0)
 
 # Output most similar pair
 
 df_subset[
   which(gower_mat == min(gower_mat[gower_mat != min(gower_mat)]),
-        arr.ind = TRUE)[1, ], ]
+        arr.ind = TRUE)[1, ], fsubset_0]
 # Output most dissimilar pair
 
 df_subset[
   which(gower_mat == max(gower_mat[gower_mat != max(gower_mat)]),
-        arr.ind = TRUE)[1, ], ]
+        arr.ind = TRUE)[1, ],fsubset_0 ]
 ```
 <h2>Algorithm 1 - Partitioning Around Medoids</h2>
 
@@ -72,26 +108,68 @@ Both k-means and k-medoids approaches are identical, except k-means has cluster 
 We then look at the silhouette width - a validation metric which is an aggregated measure of how similar an observation is to its own cluster compared its closest neighboring cluster. The metric can range from -1 to 1, where higher values are better. 
 
 Increasing number of clusters will almost always lead to better silhouette score, but that does not make sense or satisfy the objective. Long story short, we should pick a meaningful number that is simple and equally as good.
+
+We look at silhouette score for all feature subsets
+
 ```{r}
 max_clusters <- 20
-sil_width <- c(NA)
+sil_width_0 <- c(NA)
+sil_width_1 <- c(NA)
+sil_width_2 <- c(NA)
+sil_width_3 <- c(NA)
+
+
 
 for(i in 2:max_clusters){
-  
-  pam_fit <- pam(gower.dist,
+  pam_fit <- pam(gower.dist.0,
                  diss = TRUE,
                  k = i)
   
-  sil_width[i] <- pam_fit$silinfo$avg.width
+  sil_width_0[i] <- pam_fit$silinfo$avg.width
   
 }
 
-# Plot sihouette width (higher is better)
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.1,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_1[i] <- pam_fit$silinfo$avg.width
+  
+}
 
-plot(1:max_clusters, sil_width,
-     xlab = "Number of clusters",
-     ylab = "Silhouette Width")
-lines(1:max_clusters, sil_width)
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.2,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_2[i] <- pam_fit$silinfo$avg.width
+  
+}
+
+for(i in 2:max_clusters){
+  pam_fit <- pam(gower.dist.3,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width_3[i] <- pam_fit$silinfo$avg.width
+  
+}
+```
+
+***Visualize the results of Silhouette Analysis***
+
+```{r}
+plot(1:max_clusters, sil_width_0, type="o", col="blue", pch="o", lty=1,ylim=c(0.1,0.7),ylab="Silhouette Width",xlab = 'Number of clusters' )
+points(1:max_clusters, sil_width_1, col="red", pch="*")
+lines(1:max_clusters, sil_width_1, col="red",lty=2)
+points(1:max_clusters, sil_width_2, col="dark green", pch="+")
+lines(1:max_clusters, sil_width_2, col="dark green",lty=3)
+points(1:max_clusters, sil_width_3, col="dark red", pch="x")
+lines(1:max_clusters, sil_width_3, col="dark red",lty=4)
+
+legend(1,0.7,legend=c("0","1","2", "3"), col=c("blue","red","dark green" ,"dark red"),
+                                   pch=c("o","*","+", "x"),lty=c(1,2,3,4), ncol=1)
 
 ```
 
@@ -101,11 +179,11 @@ After running the algorithm and selecting 7 clusters, we can interpret the clust
 ```{r}
 library(dplyr)
 num_clusters = 7
-pam_fit <- pam(gower.dist,
+pam_fit <- pam(gower.dist.0,
                  diss = TRUE,
                  k = num_clusters)
 
-pam_results <- df_subset %>%
+pam_results <- df_subset[, fsubset_0] %>%
   mutate(cluster = pam_fit$clustering) %>%
   group_by(cluster) %>%
   do(the_summary = summary(.))
@@ -122,13 +200,13 @@ library(ggplot2)
 library(dplyr)
 
 
-tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+tsne_obj <- Rtsne(gower.dist.0, is_distance = TRUE)
 
 tsne_data <- tsne_obj$Y %>%
   data.frame() %>%
   setNames(c("X", "Y")) %>%
   mutate(cluster = factor(pam_fit$clustering),
-         name = df_subset$name)
+         name = df_subset[,fsubset_0]$name)
 
 ggplot(aes(x = X, y = Y), data = tsne_data) +
   geom_point(aes(color = cluster))
@@ -147,7 +225,7 @@ ggplot(aes(x = X, y = Y), data = tsne_data) +
 
 ```{r}
 #------------ DIVISIVE CLUSTERING ------------#
-divisive.clust <- diana(gower.dist, 
+divisive.clust <- diana(gower.dist.0, 
                   diss = TRUE, keep.diss = FALSE)
 divisive.clust$dc
 pltree(divisive.clust, main = "Divisive")
@@ -157,10 +235,10 @@ pltree(divisive.clust, main = "Divisive")
 #------------ AGGLOMERATIVE CLUSTERING ------------#
 # “complete”, “average”, “single”, “ward.D”
 par(mfrow=c(2,2))
-aggl.clust.c <- hclust(gower.dist, method = "complete")
-aggl.clust.a <- hclust(gower.dist, method = "average")
-aggl.clust.s <- hclust(gower.dist, method = "single")
-aggl.clust.w <- hclust(gower.dist, method = "ward.D")
+aggl.clust.c <- hclust(gower.dist.0, method = "complete")
+aggl.clust.a <- hclust(gower.dist.0, method = "average")
+aggl.clust.s <- hclust(gower.dist.0, method = "single")
+aggl.clust.w <- hclust(gower.dist.0, method = "ward.D")
 plot(aggl.clust.c,
      main = "Agglomerative, complete linkages")
 plot(aggl.clust.a,
@@ -181,7 +259,7 @@ names(m) <- c( "average", "single", "complete", "ward")
 
 # function to compute coefficient
 ac <- function(x) {
-  agnes(gower.dist, diss = TRUE, method = x)$ac
+  agnes(gower.dist.0, diss = TRUE, method = x)$ac
 }
 
 map(m, ac)
@@ -197,13 +275,13 @@ rect.hclust(aggl.clust.w, k = 6, border = 1:6)
 
 **Visualize results in 2D**
 ```{r}
-tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+tsne_obj <- Rtsne(gower.dist.0, is_distance = TRUE)
 
 tsne_data <- tsne_obj$Y %>%
   data.frame() %>%
   setNames(c("X", "Y")) %>%
   mutate(cluster = factor(sub_grp),
-         name = df_subset$name)
+         name = df_subset[,fsubset_0]$name)
 
 ggplot(aes(x = X, y = Y), data = tsne_data) +
   geom_point(aes(color = cluster))
@@ -213,7 +291,7 @@ ggplot(aes(x = X, y = Y), data = tsne_data) +
 Lets try to interpret the clusters in terms of descriptive statistics
 
 ```{r}
-algo_results <- df_subset %>%
+algo_results <- df_subset[,fsubset_0] %>%
   mutate(cluster = sub_grp) %>%
   group_by(cluster) %>%
   do(the_summary = summary(.))
