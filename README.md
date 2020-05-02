@@ -10,6 +10,7 @@ This project aims to analyze restaurant reviews on Yelp via topic modeling to de
 We will also try to capture segments of restaurants in a city based on cuisines, restaurant attributes, popularity and customer sentiment using clustering techniques.
 
 <img src="./Review Analysis/dashboard.png" alt="drawing" width="800"/>
+
 ## References
 1.  Yu, Boya, Jiaxu Zhou, Yi Zhang, and Yunong Cao. “Identifying Restaurant Features via Sentiment Analysis on Yelp Reviews.” arXiv preprint arXiv:1709.08698 (2017).
 
