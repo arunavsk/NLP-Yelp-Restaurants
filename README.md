@@ -9,6 +9,8 @@ This project aims to analyze restaurant reviews on Yelp via topic modeling to de
 2. [Restaurant Segmentation](https://github.com/arunavsk/NLP-Yelp-Restaurants/blob/master/Restaurant%20Clustering/Clustering-Analysis---Mixed-Clustering.md)<br>
 We will also try to capture segments of restaurants in a city based on cuisines, restaurant attributes, popularity and customer sentiment using clustering techniques.
 
+Read this [writeup](Report.pdf) for more info
+
 <img src="./Review Analysis/dashboard.png" alt="drawing" width="800"/>
 
 ## References
