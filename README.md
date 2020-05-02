@@ -11,6 +11,8 @@ We will also try to capture segments of restaurants in a city based on cuisines,
 
 Read this [writeup](Report.pdf) for more info
 
+Link to the [Tableau Dashboard](https://public.tableau.com/profile/arunav.saikia#!/vizhome/Book3_15884173944240/Dashboard1)
+
 <img src="./Review Analysis/dashboard.png" alt="drawing" width="800"/>
 
 ## References
